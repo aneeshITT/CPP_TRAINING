@@ -265,7 +265,7 @@ char readContinueChoice()
         if (!readInputLine(choiceInput))
         {
             std::cout << "\nEOF detected. Program exiting.\n";
-            exit(0);
+            return 'n';
         }
 
         if (isValidChoice(choiceInput))
