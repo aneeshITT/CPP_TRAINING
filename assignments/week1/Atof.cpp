@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
  
-bool isDigitChar(char character)
+bool isDigit(char character)
 {
     return character >= '0' && character <= '9';
 }
@@ -15,12 +15,11 @@ bool isSpace(char spaceCharacter) {
     
     bool isWhitespace = false;
     
-    if (spaceCharacter == ' '  ||
+    if (
+        spaceCharacter == ' '  ||
         spaceCharacter == '\t' || 
-        spaceCharacter == '\n' ||  
-        spaceCharacter == '\r' ||  
-        spaceCharacter == '\f' ||  
-        spaceCharacter == '\v')    
+        spaceCharacter == '\n'  
+    )    
     {
         isWhitespace = true;
     } 
@@ -35,243 +34,243 @@ bool isSign(char signcharacter)
 {
     return signcharacter == '+' || signcharacter == '-';
 }
- 
-bool isExponent(char character)
+
+bool isExponentChar(char currentChar)
 {
-    return character == 'e' || character == 'E';
+    return currentChar == 'e' || currentChar == 'E';
 }
  
-void skipLeadingSpaces(const std::string& inputText, int& currentPosition)
+void skipLeadingSpaces(const std::string& input, int& position)
 {
-    while (currentPosition < (int)inputText.size() && isSpace(inputText[currentPosition]))
+    while (position < (int)input.size() && isSpace(input[position]))
     {
-        currentPosition++;
+        position++;
     }
 }
  
-bool readOptionalSign(const std::string& inputText, int& currentPosition)
+bool readOptionalSign(const std::string& input, int& position)
 {
-    bool isNegativeNumber = false;
- 
-    if (currentPosition < (int)inputText.size() && isSign(inputText[currentPosition]))
+    bool isNegative = false;
+
+    if (position < (int)input.size() && isSign(input[position]))
     {
-        isNegativeNumber = (inputText[currentPosition] == '-');
-        currentPosition++;
+        isNegative = (input[position] == '-');
+        position++;
     }
- 
-    return isNegativeNumber;
+
+    return isNegative;
 }
  
-double powerOfTen(int exponentValue)
+double powerOfTen(int exponent)
 {
-    double powerResult = 1.0;
- 
-    while (exponentValue > 0)
+    double result = 1.0;
+
+    while (exponent > 0)
     {
-        powerResult *= 10.0;
-        exponentValue--;
+        result *= 10.0;
+        exponent--;
     }
- 
-    while (exponentValue < 0)
+
+    while (exponent < 0)
     {
-        powerResult /= 10.0;
-        exponentValue++;
+        result /= 10.0;
+        exponent++;
     }
- 
-    return powerResult;
+
+    return result;
 }
  
-double parseIntegerPart(const std::string& inputText, int& currentPosition, bool& hasIntegerDigits)
+double parseIntegerPart(const std::string& input, int& position, bool& hasIntegerDigits)
 {
-    double integerValue = 0.0;
+    double integerPart = 0.0;
     hasIntegerDigits = false;
- 
-    while (currentPosition < (int)inputText.size() && isDigitChar(inputText[currentPosition]))
+
+    while (position < (int)input.size() && isDigit(input[position]))
     {
         hasIntegerDigits = true;
-        integerValue = integerValue * 10.0 + getDigitValue(inputText[currentPosition]);
-        currentPosition++;
+        integerPart = integerPart * 10.0 + getDigitValue(input[position]);
+        position++;
     }
- 
-    return integerValue;
+
+    return integerPart;
 }
  
-double parseFractionPart(const std::string& inputText, int& currentPosition, bool& hasFractionDigits)
+double parseFractionPart(const std::string& input, int& position, bool& hasFractionDigits)
 {
-    double fractionValue = 0.0;
-    double fractionDivisor = 1.0;
+    double fractionNumber = 0.0;
+    double scaleFactor = 1.0;
     hasFractionDigits = false;
- 
-    while (currentPosition < (int)inputText.size() && isDigitChar(inputText[currentPosition]))
+
+    while (position < (int)input.size() && isDigit(input[position]))
     {
         hasFractionDigits = true;
-        fractionValue = fractionValue * 10.0 + getDigitValue(inputText[currentPosition]);
-        fractionDivisor *= 10.0;
-        currentPosition++;
+        fractionNumber = fractionNumber * 10.0 + getDigitValue(input[position]);
+        scaleFactor *= 10.0;
+        position++;
     }
- 
+
     if (!hasFractionDigits)
     {
         return 0.0;
     }
- 
-    return fractionValue / fractionDivisor;
+
+    return fractionNumber / scaleFactor;
 }
  
-int parseExponentPart(const std::string& inputText, int& currentPosition, bool& hasValidExponent)
+int parseExponentPart(const std::string& input, int& position, bool& hasExponent)
 {
-    bool isNegativeExponent = readOptionalSign(inputText, currentPosition);
+    bool isNegativeExponent = readOptionalSign(input, position);
     bool hasExponentDigits = false;
-    double exponentNumber = parseIntegerPart(inputText, currentPosition, hasExponentDigits);
- 
-    hasValidExponent = hasExponentDigits;
- 
-    if (!hasValidExponent)
+    double exponentNumber = parseIntegerPart(input, position, hasExponentDigits);
+
+    hasExponent = hasExponentDigits;
+
+    if (!hasExponent)
     {
         return 0;
     }
- 
-    int exponentValue = (int)exponentNumber;
- 
+
+    int exponent = (int)exponentNumber;
+
     if (isNegativeExponent)
     {
-        exponentValue = -exponentValue;
+        exponent = -exponent;
     }
- 
-    return exponentValue;
+
+    return exponent;
 }
  
-double parseDecimalNumber(const std::string& inputText, int& currentPosition)
+double parseDecimalNumber(const std::string& input, int& position)
 {
-    bool hasWholeDigits = false;
-    double wholeNumberPart = parseIntegerPart(inputText, currentPosition, hasWholeDigits);
- 
-    bool hasDecimalDigits = false;
-    double decimalPart = 0.0;
- 
-    if (currentPosition < (int)inputText.size() && inputText[currentPosition] == '.')
+    bool hasIntegerDigits = false;
+    double integerPart = parseIntegerPart(input, position, hasIntegerDigits);
+
+    bool hasFractionDigits = false;
+    double fractionPart = 0.0;
+
+    if (position < (int)input.size() && input[position] == '.')
     {
-        currentPosition++;
-        decimalPart = parseFractionPart(inputText, currentPosition, hasDecimalDigits);
+        position++;
+        fractionPart = parseFractionPart(input, position, hasFractionDigits);
     }
- 
-    if (!hasWholeDigits && !hasDecimalDigits)
+
+    if (!hasIntegerDigits && !hasFractionDigits)
     {
         return 0.0;
     }
- 
-    double finalNumber = wholeNumberPart + decimalPart;
- 
-    if (currentPosition < (int)inputText.size() && isExponent(inputText[currentPosition]))
+
+    double numericValue = integerPart + fractionPart;
+
+    if (position < (int)input.size() && isExponentChar(input[position]))
     {
-        int savedPosition = currentPosition;
-        currentPosition++;
- 
-        bool hasExponentValue = false;
-        int exponentValue = parseExponentPart(inputText, currentPosition, hasExponentValue);
- 
-        if (hasExponentValue)
+        int previousPosition = position;
+        position++;
+
+        bool hasExponentDigits = false;
+        int exponent = parseExponentPart(input, position, hasExponentDigits);
+
+        if (hasExponentDigits)
         {
-            finalNumber *= powerOfTen(exponentValue);
+            numericValue *= powerOfTen(exponent);
         }
         else
         {
-            currentPosition = savedPosition;
+            position = previousPosition;
         }
     }
- 
-    return finalNumber;
+
+    return numericValue;
 }
  
-double stringToDouble(const std::string& inputText)
+double stringToDouble(const std::string& input)
 {
-    int currentPosition = 0;
- 
-    skipLeadingSpaces(inputText, currentPosition);
- 
-    if (currentPosition == (int)inputText.size())
+    int position = 0;
+
+    skipLeadingSpaces(input, position);
+
+    if (position == (int)input.size())
     {
         return 0.0;
     }
- 
-    bool isNegativeNumber = readOptionalSign(inputText, currentPosition);
- 
-    double convertedValue = parseDecimalNumber(inputText, currentPosition);
- 
-    if (isNegativeNumber)
+
+    bool isNegative = readOptionalSign(input, position);
+
+    double parsedValue = parseDecimalNumber(input, position);
+
+    if (isNegative)
     {
-        convertedValue = -convertedValue;
+        parsedValue = -parsedValue;
     }
- 
-    return convertedValue;
+
+    return parsedValue;
 }
  
-bool readInputLine(std::string& enteredText)
+bool readInputLine(std::string& inputLine)
 {
-    enteredText.clear();
-    char currentCharacter;
+    inputLine.clear();
+    char currentChar;
 
     while (true)
     {
-        if (!std::cin.get(currentCharacter))
+        if (!std::cin.get(currentChar))
         {
             return false;
         }
 
-        if (currentCharacter == '\n')
+        if (currentChar == '\n')
         {
             break;
         }
 
-        enteredText += currentCharacter;
+        inputLine += currentChar;
     }
 
     return true;
 }
  
-bool isValidChoice(const std::string& choiceText) 
+bool isValidChoice(const std::string& choiceInput) 
 {
-    bool isInputValid = false;
+    bool isChoiceValid = false;
 
-    if (choiceText.size() == 1) 
+    if (choiceInput.size() == 1) 
     {
-        char firstChar = choiceText[0];
+        char selectedOption = choiceInput[0];
 
-        if (firstChar == 'y' || firstChar == 'Y' || 
-            firstChar == 'n' || firstChar == 'N') 
+        if (selectedOption == 'y' || selectedOption == 'Y' || 
+            selectedOption == 'n' || selectedOption == 'N') 
         {
-            isInputValid = true;
+            isChoiceValid = true;
         } 
         else 
         {
-            isInputValid = false;
+            isChoiceValid = false;
         }
     } 
     else 
     {
-        isInputValid = false;
+        isChoiceValid = false;
     }
 
-    return isInputValid;
+    return isChoiceValid;
 }
  
-char readUserChoice()
+char readContinueChoice()
 {
     while (true)
     {
-        std::string userChoiceText;
+        std::string choiceInput;
 
         std::cout << "\nDo you want to enter another value? (y/n): ";
 
-        if (!readInputLine(userChoiceText))
+        if (!readInputLine(choiceInput))
         {
             std::cout << "\nEOF detected. Program exiting.\n";
             exit(0);
         }
 
-        if (isValidChoice(userChoiceText))
+        if (isValidChoice(choiceInput))
         {
-            return userChoiceText[0];
+            return choiceInput[0];
         }
 
         std::cout << "Please enter only y or n.\n";
@@ -280,28 +279,28 @@ char readUserChoice()
  
 int main()
 {
-    char userChoice = 'y';
+    char continueChoice = 'y';
 
     do
     {
-        std::string inputString;
+        std::string userInput;
 
         std::cout << "Enter a floating-point value: ";
 
-        if (!readInputLine(inputString))
+        if (!readInputLine(userInput))
         {
             std::cout << "\nEOF detected. Program exiting.\n";
             break;
         }
 
-        double Result = stringToDouble(inputString);
+        double convertedValue = stringToDouble(userInput);
 
-        std::cout << "Input entered   : " << inputString << '\n';
-        std::cout << "Converted value : " << Result << '\n';
+        std::cout << "Input entered   : " << userInput << '\n';
+        std::cout << "Converted value : " << convertedValue << '\n';
 
-        userChoice = readUserChoice();
+        continueChoice = readContinueChoice();
 
-    } while (userChoice == 'y' || userChoice == 'Y');
+    } while (continueChoice == 'y' || continueChoice == 'Y');
 
     return 0;
 }
