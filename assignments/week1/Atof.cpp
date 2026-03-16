@@ -42,7 +42,7 @@ bool isExponentChar(char currentChar)
  
 void skipLeadingSpaces(const std::string& input, int& position)
 {
-    while (position < (int)input.size() && isSpace(input[position]))
+    while (position < input.size() && isSpace(input[position]))
     {
         position++;
     }
@@ -52,7 +52,7 @@ bool readOptionalSign(const std::string& input, int& position)
 {
     bool isNegative = false;
 
-    if (position < (int)input.size() && isSign(input[position]))
+    if (position < input.size() && isSign(input[position]))
     {
         isNegative = (input[position] == '-');
         position++;
@@ -85,7 +85,7 @@ double parseIntegerPart(const std::string& input, int& position, bool& hasIntege
     double integerPart = 0.0;
     hasIntegerDigits = false;
 
-    while (position < (int)input.size() && isDigit(input[position]))
+    while (position < input.size() && isDigit(input[position]))
     {
         hasIntegerDigits = true;
         integerPart = integerPart * 10.0 + getDigitValue(input[position]);
@@ -101,7 +101,7 @@ double parseFractionPart(const std::string& input, int& position, bool& hasFract
     double scaleFactor = 1.0;
     hasFractionDigits = false;
 
-    while (position < (int)input.size() && isDigit(input[position]))
+    while (position < input.size() && isDigit(input[position]))
     {
         hasFractionDigits = true;
         fractionNumber = fractionNumber * 10.0 + getDigitValue(input[position]);
@@ -148,7 +148,7 @@ double parseDecimalNumber(const std::string& input, int& position)
     bool hasFractionDigits = false;
     double fractionPart = 0.0;
 
-    if (position < (int)input.size() && input[position] == '.')
+    if (position < input.size() && input[position] == '.')
     {
         position++;
         fractionPart = parseFractionPart(input, position, hasFractionDigits);
@@ -161,7 +161,7 @@ double parseDecimalNumber(const std::string& input, int& position)
 
     double numericValue = integerPart + fractionPart;
 
-    if (position < (int)input.size() && isExponentChar(input[position]))
+    if (position < input.size() && isExponentChar(input[position]))
     {
         int previousPosition = position;
         position++;
@@ -188,7 +188,7 @@ double stringToDouble(const std::string& input)
 
     skipLeadingSpaces(input, position);
 
-    if (position == (int)input.size())
+    if (position == input.size())
     {
         return 0.0;
     }
