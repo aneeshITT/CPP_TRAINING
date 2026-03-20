@@ -26,6 +26,14 @@ int main(){
         } std::cout<<std::endl;
     }
 
+    //array free 
+
+    for(int i = 0; i<n; i++){
+
+        delete [] arr[i];
+    }
+    delete [] arr;
+
 
     return 0;
 }
